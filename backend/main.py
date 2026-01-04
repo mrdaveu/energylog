@@ -108,61 +108,73 @@ async def create_demo_user(db: Session = Depends(get_db)):
     db.commit()
     db.refresh(user)
 
-    # Demo entries - your real data + mock entries
+    now = datetime.utcnow()
+
+    # Demo entries with RELATIVE timestamps (minutes ago from now)
     demo_entries = [
-        # Jan 2 - your data
-        {"timestamp": datetime(2025, 1, 2, 21, 0), "description": "McDonalds - 9 chicken mcnuggets", "energy": None},
-        {"timestamp": datetime(2025, 1, 2, 21, 15), "description": "Extreme fatigue(!), brain turning off", "energy": 2},
-        {"timestamp": datetime(2025, 1, 3, 1, 0), "description": "Cheese bagel with chicken (dark soy, soy sauce), grana padano", "energy": None},
-        {"timestamp": datetime(2025, 1, 3, 1, 30), "description": "Greek yogurt, mango, pecans", "energy": None},
-        {"timestamp": datetime(2025, 1, 3, 2, 0), "description": "Felt fine", "energy": 7},
+        # Recent entries (within last few hours)
+        {"minutes_ago": 5, "description": "Just had coffee", "energy": 6},
+        {"minutes_ago": 45, "description": "Woke up, feeling groggy", "energy": 4},
+        {"minutes_ago": 120, "description": "Couldn't sleep well", "energy": 3},
 
-        # Jan 3 - your data
-        {"timestamp": datetime(2025, 1, 3, 9, 0), "description": "Sleep 9h, really difficult to wake up", "energy": 4},
-        {"timestamp": datetime(2025, 1, 3, 16, 0), "description": "Bagel with scrambled eggs, olive oil, grana padano + pickled perilla leaf", "energy": None},
-        {"timestamp": datetime(2025, 1, 3, 22, 0), "description": "Indomie with leftover chicken and five veggies", "energy": None},
-        {"timestamp": datetime(2025, 1, 4, 0, 0), "description": "Gaming", "energy": 4},
+        # Yesterday
+        {"minutes_ago": 180, "description": "Late night snack - crackers", "energy": None},
+        {"minutes_ago": 300, "description": "Gaming session", "energy": 5},
+        {"minutes_ago": 420, "description": "Dinner - pasta with pesto", "energy": None},
+        {"minutes_ago": 540, "description": "Afternoon walk", "energy": 7},
+        {"minutes_ago": 600, "description": "Lunch - sandwich", "energy": None},
+        {"minutes_ago": 720, "description": "Morning meeting, tired", "energy": 4},
+        {"minutes_ago": 840, "description": "Breakfast - oatmeal", "energy": 6},
 
-        # Mock entries - Dec 31
-        {"timestamp": datetime(2024, 12, 31, 8, 0), "description": "Woke up, black coffee", "energy": 5},
-        {"timestamp": datetime(2024, 12, 31, 12, 30), "description": "Pho with extra bean sprouts", "energy": None},
-        {"timestamp": datetime(2024, 12, 31, 15, 0), "description": "Afternoon slump", "energy": 3},
-        {"timestamp": datetime(2024, 12, 31, 18, 0), "description": "NYE prep, cooking", "energy": 6},
-        {"timestamp": datetime(2024, 12, 31, 23, 30), "description": "Champagne toast", "energy": 8},
+        # Two days ago
+        {"minutes_ago": 1500, "description": "McDonalds - 9 chicken mcnuggets", "energy": None},
+        {"minutes_ago": 1515, "description": "Extreme fatigue(!), brain turning off", "energy": 2},
+        {"minutes_ago": 1700, "description": "Cheese bagel with chicken", "energy": None},
+        {"minutes_ago": 1800, "description": "Greek yogurt, mango, pecans", "energy": 7},
 
-        # Dec 30
-        {"timestamp": datetime(2024, 12, 30, 7, 30), "description": "Oatmeal with blueberries", "energy": 6},
-        {"timestamp": datetime(2024, 12, 30, 10, 0), "description": "Green tea, reading", "energy": 7},
-        {"timestamp": datetime(2024, 12, 30, 13, 0), "description": "Leftover pasta", "energy": None},
-        {"timestamp": datetime(2024, 12, 30, 16, 30), "description": "Walk in the park", "energy": 7},
-        {"timestamp": datetime(2024, 12, 30, 20, 0), "description": "Salmon, rice, broccoli", "energy": None},
-        {"timestamp": datetime(2024, 12, 30, 22, 0), "description": "Winding down", "energy": 5},
+        # Three days ago
+        {"minutes_ago": 2880, "description": "Sleep 9h, difficult to wake up", "energy": 4},
+        {"minutes_ago": 3000, "description": "Bagel with scrambled eggs", "energy": None},
+        {"minutes_ago": 3200, "description": "Indomie with veggies", "energy": None},
+        {"minutes_ago": 3400, "description": "Focused work session", "energy": 9},
 
-        # Dec 29
-        {"timestamp": datetime(2024, 12, 29, 9, 0), "description": "Slept in, croissant", "energy": 6},
-        {"timestamp": datetime(2024, 12, 29, 14, 0), "description": "Ramen", "energy": None},
-        {"timestamp": datetime(2024, 12, 29, 17, 0), "description": "Vitamin D supplement", "energy": None},
-        {"timestamp": datetime(2024, 12, 29, 19, 30), "description": "Stir fry tofu", "energy": None},
-        {"timestamp": datetime(2024, 12, 29, 23, 0), "description": "Late night coding", "energy": 4},
+        # Four days ago
+        {"minutes_ago": 4320, "description": "Woke up, black coffee", "energy": 5},
+        {"minutes_ago": 4500, "description": "Pho for lunch", "energy": None},
+        {"minutes_ago": 4680, "description": "Afternoon slump", "energy": 3},
+        {"minutes_ago": 4800, "description": "Evening cooking", "energy": 6},
+        {"minutes_ago": 5000, "description": "Late night reading", "energy": 5},
 
-        # Dec 28
-        {"timestamp": datetime(2024, 12, 28, 8, 30), "description": "Eggs and toast", "energy": 7},
-        {"timestamp": datetime(2024, 12, 28, 12, 0), "description": "Burrito bowl", "energy": None},
-        {"timestamp": datetime(2024, 12, 28, 15, 0), "description": "Post-lunch crash", "energy": 3},
-        {"timestamp": datetime(2024, 12, 28, 18, 0), "description": "Espresso", "energy": 6},
-        {"timestamp": datetime(2024, 12, 28, 21, 0), "description": "Light dinner, soup", "energy": None},
+        # Five days ago
+        {"minutes_ago": 5760, "description": "Oatmeal with blueberries", "energy": 6},
+        {"minutes_ago": 5900, "description": "Green tea, reading", "energy": 7},
+        {"minutes_ago": 6100, "description": "Leftover pasta", "energy": None},
+        {"minutes_ago": 6300, "description": "Walk in the park", "energy": 7},
+        {"minutes_ago": 6500, "description": "Salmon dinner", "energy": None},
 
-        # Dec 27
-        {"timestamp": datetime(2024, 12, 27, 7, 0), "description": "Early start, smoothie", "energy": 8},
-        {"timestamp": datetime(2024, 12, 27, 11, 0), "description": "Focused work session", "energy": 9},
-        {"timestamp": datetime(2024, 12, 27, 13, 30), "description": "Sushi lunch", "energy": None},
-        {"timestamp": datetime(2024, 12, 27, 16, 0), "description": "Magnesium supplement", "energy": None},
-        {"timestamp": datetime(2024, 12, 27, 20, 0), "description": "Thai curry", "energy": None},
-        {"timestamp": datetime(2024, 12, 27, 22, 30), "description": "Relaxed evening", "energy": 6},
+        # Six days ago
+        {"minutes_ago": 7200, "description": "Slept in, croissant", "energy": 6},
+        {"minutes_ago": 7400, "description": "Ramen for lunch", "energy": None},
+        {"minutes_ago": 7600, "description": "Vitamin D supplement", "energy": None},
+        {"minutes_ago": 7800, "description": "Stir fry tofu", "energy": None},
+        {"minutes_ago": 8000, "description": "Late night coding", "energy": 4},
+
+        # Seven days ago
+        {"minutes_ago": 8640, "description": "Eggs and toast", "energy": 7},
+        {"minutes_ago": 8800, "description": "Burrito bowl", "energy": None},
+        {"minutes_ago": 9000, "description": "Post-lunch crash", "energy": 3},
+        {"minutes_ago": 9200, "description": "Espresso pick-me-up", "energy": 6},
+        {"minutes_ago": 9400, "description": "Light dinner, soup", "energy": None},
     ]
 
     for entry_data in demo_entries:
-        entry = Entry(user_id=user.id, **entry_data)
+        timestamp = now - timedelta(minutes=entry_data["minutes_ago"])
+        entry = Entry(
+            user_id=user.id,
+            timestamp=timestamp,
+            description=entry_data["description"],
+            energy=entry_data.get("energy")
+        )
         db.add(entry)
 
     db.commit()

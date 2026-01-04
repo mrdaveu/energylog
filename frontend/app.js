@@ -63,7 +63,7 @@ function yToMinutes(y) {
 
 // Convert timestamp to Y position relative to "now"
 function timeToY(timestamp, nowTime) {
-    const diffMs = nowTime - new Date(timestamp).getTime();
+    const diffMs = nowTime - parseTimestamp(timestamp).getTime();
     const diffMinutes = diffMs / 60000;
     return minutesToY(diffMinutes);
 }
